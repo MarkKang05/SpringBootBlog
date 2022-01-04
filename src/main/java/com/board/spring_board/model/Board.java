@@ -1,29 +1,38 @@
 package com.board.spring_board.model;
 
 import com.board.spring_board.utils.BaseTimeEntity;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@NoArgsConstructor
 public class Board extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
-    private String authorId;
-
-    private String authorName;
-
+    @Lob
+    @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private  Long views;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId")
+    private User user;
 
-
+    @Builder
+    public Board(String title, String description, Long views, User user) {
+        this.title = title;
+        this.description = description;
+        this.views = views;
+        this.user = user;
+    }
 }
