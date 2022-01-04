@@ -1,3 +1,9 @@
 {{> /layout/navigation}}
-<h1>Hello world</h1>
+
+{{#boards}}
+{{id}}
+<a href="/board/{{id}}">{{title}}</a>
+<br>
+{{/boards}}
+
 {{> /layout/footer}}
