@@ -35,4 +35,15 @@ public class Board extends BaseTimeEntity {
         this.views = views;
         this.user = user;
     }
+
+    @Override
+    public String toString() {
+        return "Board{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", views=" + views +
+                ", user=" + user +
+                '}';
+    }
 }
