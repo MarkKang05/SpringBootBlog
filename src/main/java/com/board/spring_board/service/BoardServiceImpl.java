@@ -1,6 +1,7 @@
 package com.board.spring_board.service;
 
 import com.board.spring_board.dto.board.RequestSaveBoardDto;
+import com.board.spring_board.dto.board.RequestUpdateBoardDto;
 import com.board.spring_board.model.Board;
 import com.board.spring_board.model.User;
 import com.board.spring_board.repository.BoardRepository;
@@ -30,6 +31,20 @@ public class BoardServiceImpl implements BoardService{
 
     public Optional<Board> getBoard(Long id){
         return boardRepository.findById(id);
+    }
+
+    @Override
+    public void update(Long id, RequestUpdateBoardDto requestUpdateBoardDto) {
+        Board board = boardRepository.findById(id).get();
+        board.setTitle(requestUpdateBoardDto.getTitle());
+        board.setDescription(requestUpdateBoardDto.getDescription());
+        boardRepository.save(board);
+    }
+
+    @Override
+    public void deleteBoard(Long id) {
+        Board board = boardRepository.findById(id).get();
+        boardRepository.delete(board);
     }
 
 }
