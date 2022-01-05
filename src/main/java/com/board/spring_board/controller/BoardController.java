@@ -1,6 +1,7 @@
 package com.board.spring_board.controller;
 
 import com.board.spring_board.dto.board.RequestSaveBoardDto;
+import com.board.spring_board.dto.board.RequestUpdateBoardDto;
 import com.board.spring_board.model.Board;
 import com.board.spring_board.service.BoardService;
 import com.board.spring_board.utils.HttpSessionUtils;
@@ -36,9 +37,29 @@ public class BoardController {
 
     @GetMapping("/board/{id}")
     public String getBoard(@PathVariable Long id, Model model){
-        System.out.println(boardService.getBoard(id).get());
+//        System.out.println(boardService.getBoard(id).get());
         model.addAttribute(boardService.getBoard(id).get());
         return "/board/boardDetail";
+    }
+
+    @GetMapping("/board/update/{id}")
+    public String boardUpdatePage(@PathVariable Long id, Model model){
+        model.addAttribute("board", boardService.getBoard(id).get());
+
+        return "/board/boardUpdate";
+    }
+
+    @PostMapping("/board/updateProc/{id}")
+    public String boardUpdateProc(@PathVariable Long id, RequestUpdateBoardDto requestUpdateBoardDto){
+        boardService.update(id, requestUpdateBoardDto);
+
+        return "redirect:/";
+    }
+
+    @GetMapping("/board/delete/{id}")
+    public String boardDeleteProc(@PathVariable Long id){
+        boardService.deleteBoard(id);
+        return "redirect:/";
     }
 
 }

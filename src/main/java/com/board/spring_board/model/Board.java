@@ -3,10 +3,12 @@ package com.board.spring_board.model;
 import com.board.spring_board.utils.BaseTimeEntity;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
+@Setter
 @NoArgsConstructor
 public class Board extends BaseTimeEntity {
 
