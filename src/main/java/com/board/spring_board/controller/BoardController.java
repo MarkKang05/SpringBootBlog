@@ -3,6 +3,7 @@ package com.board.spring_board.controller;
 import com.board.spring_board.dto.board.RequestSaveBoardDto;
 import com.board.spring_board.dto.board.RequestUpdateBoardDto;
 import com.board.spring_board.model.Board;
+import com.board.spring_board.model.User;
 import com.board.spring_board.service.BoardService;
 import com.board.spring_board.utils.HttpSessionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,10 @@ public class BoardController {
     private BoardService boardService;
 
     @GetMapping("/boardForm")
-    public String boardCreatePage(){
+    public String boardCreatePage(HttpSession session){
+        if (!HttpSessionUtils.isLoginUser(session)){
+            return "redirect:/";
+        }
         return "board/boardCreate";
     }
 
@@ -37,14 +41,20 @@ public class BoardController {
 
     @GetMapping("/board/{id}")
     public String getBoard(@PathVariable Long id, Model model){
+
 //        System.out.println(boardService.getBoard(id).get());
-        model.addAttribute(boardService.getBoard(id).get());
+        model.addAttribute(boardService.getBoard(id));
         return "/board/boardDetail";
     }
 
     @GetMapping("/board/update/{id}")
-    public String boardUpdatePage(@PathVariable Long id, Model model){
-        model.addAttribute("board", boardService.getBoard(id).get());
+    public String boardUpdatePage(@PathVariable Long id, Model model, HttpSession session){
+        Long userId = ((User) session.getAttribute(HttpSessionUtils.USER_SESSION_KEY)).getId();
+        if (!boardService.hasAuthority(id, userId)){
+            return "redirect:/";
+        }
+
+        model.addAttribute("board", boardService.getBoard(id));
 
         return "/board/boardUpdate";
     }
@@ -57,7 +67,12 @@ public class BoardController {
     }
 
     @GetMapping("/board/delete/{id}")
-    public String boardDeleteProc(@PathVariable Long id){
+    public String boardDeleteProc(@PathVariable Long id, HttpSession session){
+        Long userId = ((User) session.getAttribute(HttpSessionUtils.USER_SESSION_KEY)).getId();
+        if (!boardService.hasAuthority(id, userId)){
+            return "redirect:/";
+        }
+
         boardService.deleteBoard(id);
         return "redirect:/";
     }
