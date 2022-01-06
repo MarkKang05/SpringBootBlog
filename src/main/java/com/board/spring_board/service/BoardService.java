@@ -11,9 +11,10 @@ import java.util.Optional;
 public interface BoardService {
     void create(RequestSaveBoardDto requestSaveBoardDto, User user);
     List<Board> getAllBoard();
-    Optional<Board> getBoard(Long id);
+    Board getBoard(Long id);
 
     void update(Long id, RequestUpdateBoardDto requestUpdateBoardDto);
 
     void deleteBoard(Long id);
+    boolean hasAuthority(Long boardId, Long userId);
 }
