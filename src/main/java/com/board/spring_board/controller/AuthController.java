@@ -1,5 +1,7 @@
 package com.board.spring_board.controller;
 
+import com.board.spring_board.dto.user.RequestLoginUserDto;
+import com.board.spring_board.dto.user.RequestSaveUserDto;
 import com.board.spring_board.jwt.TokenProvider;
 import com.board.spring_board.model.Role;
 import com.board.spring_board.model.User;
@@ -24,30 +26,30 @@ public class AuthController {
     private final TokenProvider tokenProvider;
     private final UserRepository userRepository;
 
-    @PostMapping("/auth/join")
-    public Long join(@RequestBody Map<String, String> user){
+    @PostMapping("/join")
+    public Long join(@RequestBody RequestSaveUserDto requestSaveUserDto){
         return userRepository.save(User.builder()
-                .username(user.get("username"))
-                .email(user.get("email"))
-                .password(passwordEncoder.encode(user.get("password")))
+                .username(requestSaveUserDto.getUsername())
+                .email(requestSaveUserDto.getEmail())
+                .password(passwordEncoder.encode(requestSaveUserDto.getPassword()))
                 .role(Role.USER)
                 .build()).getId();
     }
 
-    @PostMapping("/auth/login")
-    public String login(@RequestBody Map<String, String> user){
-        User loginUser = userRepository.findByEmail(user.get("email"))
-                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일"));
-        if (!passwordEncoder.matches(user.get("password"), loginUser.getPassword())) {
-            throw new IllegalArgumentException("잘못된 비밀번호");
-        }
-
-        List<String> roles = new ArrayList<>();
-        roles.add(String.valueOf(loginUser.getRole()));
-
-        return tokenProvider.createToken(loginUser.getUsername(), roles);
-
-    }
+//    @PostMapping("/auth/login")
+//    public String login(@RequestBody Map<String, String> user){
+//        User loginUser = userRepository.findByEmail(user.get("email"))
+//                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일"));
+//        if (!passwordEncoder.matches(user.get("password"), loginUser.getPassword())) {
+//            throw new IllegalArgumentException("잘못된 비밀번호");
+//        }
+//
+//        List<String> roles = new ArrayList<>();
+//        roles.add("USER");
+//
+//        return tokenProvider.createToken(loginUser.getUsername(), roles);
+//
+//    }
 
     @GetMapping("/user/test")
     public String test(){
