@@ -60,8 +60,8 @@ public class UserController {
         } else{
 //            System.out.println(userRepository.findByEmail(loginUser.getEmail()).getPassword());
 //            System.out.println(passwordEncoder.encode("qwer2"));
-            if(passwordEncoder.matches(loginUser.getPassword(), userRepository.findByEmail(loginUser.getEmail()).getPassword() ) ) {
-                loginUser = userRepository.findByEmail(requestSaveUserDto.getEmail());
+            if(passwordEncoder.matches(loginUser.getPassword(), userRepository.findByEmail(loginUser.getEmail()).get().getPassword() ) ) {
+                loginUser = userRepository.findByEmail(requestSaveUserDto.getEmail()).get();
                 session.setAttribute(HttpSessionUtils.USER_SESSION_KEY, loginUser);
                 return "redirect:/";
             }
