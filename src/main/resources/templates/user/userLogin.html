@@ -1,7 +1,7 @@
 {{> /layout/header}}
 
 
-<form class="form-horizontal" action='/user/loginProc' method="POST">
+<form class="form-horizontal" >
     <fieldset>
         <div id="legend">
             <legend class="">LogIn</legend>
@@ -42,17 +42,42 @@
 <!--            </div>-->
 <!--        </div>-->
 
-        <div class="control-group">
-            <!-- Button -->
-            <div class="controls">
-                <button class="btn btn-success" onclick="">login</button>
-            </div>
-        </div>
     </fieldset>
 </form>
 
-<script>
+<div class="control-group">
+    <!-- Button -->
+    <div class="controls">
+        <button class="btn btn-success" onclick="login_click();">login</button>
+    </div>
+</div>
 
+<script>
+    function login_click2() {
+        var xhr, url = 'http://localhost:8080/login'
+        var contextType = 'application/json'
+        xhr = doajax
+
+    }
+    function login_click() {
+        console.log("hhh");
+        fetch("/login", {
+            method: 'post',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: "qwer",
+                password: "1234"
+            })
+        }).then(async res => {
+            // console.log(res.text())
+            localStorage.setItem("jwt", await res.text());
+            alert("로그인 성공");
+            location.href='/';
+        });
+
+    }
 </script>
 
 {{> /layout/footer}}

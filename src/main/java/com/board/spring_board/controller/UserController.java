@@ -4,7 +4,6 @@ import com.board.spring_board.dto.user.RequestSaveUserDto;
 import com.board.spring_board.model.User;
 import com.board.spring_board.repository.UserRepository;
 import com.board.spring_board.service.UserService;
-import com.board.spring_board.service.UserServiceImpl;
 import com.board.spring_board.utils.HttpSessionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -43,7 +43,7 @@ public class UserController {
     }
 
     // Log In
-    @GetMapping("/login")
+    @GetMapping("/loginPage")
     public String loginPage(HttpSession session){
         if(HttpSessionUtils.isLoginUser(session))
             return "redirect:/";
@@ -73,7 +73,11 @@ public class UserController {
 
     }
 
-
+    @GetMapping("/user/list")
+    public String getUsers(){
+        List<User> list= userRepository.findAll();
+        return "<h1>"+ list.toString() +"</h1>";
+    }
 
 
 
