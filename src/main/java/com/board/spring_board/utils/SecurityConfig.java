@@ -25,8 +25,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserRepository userRepository;
 
-    private final TokenProvider tokenProvider;
-
     private final CorsConfig corsConfig;
 
     @Bean
