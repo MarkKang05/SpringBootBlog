@@ -86,15 +86,19 @@ public class AuthController {
     }
 
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(@RequestBody TokenRefreshRequest request) {
+    public ResponseEntity<?> refreshtoken(@RequestBody TokenRefreshRequest request) { // 새로고침할 refresh토큰
         String requestRefreshToken = request.getRefreshToken();
+        System.out.println(requestRefreshToken);
 
         RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken).get();
         try {
-            System.out.println("hello");
             User refreshUser = refreshTokenService.verifyExpiration(refreshToken).getUser();
-            String token = jwtUtils.generateTokenFromUsername(refreshUser.getEmail());
-            return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+            System.out.println(refreshUser.toString());
+            String token = jwtUtils.generateTokenFromUsername(refreshUser.getEmail()); // 새로운 Access token
+            TokenRefreshResponse tokenRefreshResponse = new TokenRefreshResponse(requestRefreshToken, token);
+            System.out.println(tokenRefreshResponse.getAccessToken());
+
+            return ResponseEntity.ok(new TokenRefreshResponse(requestRefreshToken, token));
         } catch (Exception e) {
             e.printStackTrace();
         }
