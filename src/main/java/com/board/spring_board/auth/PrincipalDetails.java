@@ -1,12 +1,16 @@
 package com.board.spring_board.auth;
 
+import com.board.spring_board.model.Role;
 import com.board.spring_board.model.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PrincipalDetails implements UserDetails {
     private User user;
@@ -15,8 +19,22 @@ public class PrincipalDetails implements UserDetails {
         this.user = user;
     }
 
+    public PrincipalDetails(Long id, String username, String email, String password, Role role) {
+        this.user = new User(id, username, email, password, role);
+    }
+
     public User getUser() {
         return user;
+    }
+
+    public static PrincipalDetails build(User user) {
+
+        return new PrincipalDetails(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getRole());
     }
 
     @Override
