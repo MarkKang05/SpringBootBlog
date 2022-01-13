@@ -138,25 +138,6 @@ public class AuthController {
 
         return null;
 
-//        return refreshTokenService.findByToken(requestRefreshToken)
-////                .map(refreshTokenService::verifyExpiration)
-//                .map(x -> {
-//                    try {
-//                        return refreshTokenService.verifyExpiration(x);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                    return null;
-//                })
-//                .map(RefreshToken::getUser)
-//                .map(user -> {
-//                    String token = jwtUtils.generateTokenFromUsername(((User) user).getUsername());
-//                    return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
-//                })
-////                .orElsethrow(() -> System.out.println(
-////                        "refresh token is not in database!"));
-//                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
-//                        "refresh token is not in database!"));
     }
 
     @PostMapping("/logout")
