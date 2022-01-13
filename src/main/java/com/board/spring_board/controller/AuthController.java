@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,7 +47,7 @@ public class AuthController {
 
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody RequestLoginUserDto loginRequest) {
+    public ResponseEntity<?> authenticateUser(@RequestBody RequestLoginUserDto loginRequest, HttpServletResponse response) {
         //로그인 프로세스 시작
         System.out.println("login Process start");
 
@@ -67,8 +69,24 @@ public class AuthController {
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUser().getId());
 
-        return ResponseEntity.ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getUser().getId(),
-                userDetails.getUser().getUsername(), userDetails.getUser().getEmail(), userDetails.getUser().getRole()));
+//        cookie
+        Cookie accessTokenCookie = new Cookie("accessToken", jwt);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setPath("/");
+        response.addCookie(accessTokenCookie);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken.getToken());
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setPath("/");
+        response.addCookie(refreshTokenCookie);
+
+
+        return ResponseEntity.ok(new JwtResponse( jwt,
+                refreshToken.getToken(),
+                userDetails.getUser().getId(),
+                userDetails.getUser().getUsername(),
+                userDetails.getUser().getEmail(),
+                userDetails.getUser().getRole()));
     }
 
     @PostMapping("/signup")
@@ -88,7 +106,7 @@ public class AuthController {
     }
 
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(@RequestBody TokenRefreshRequest request) { // 새로고침할 refresh토큰
+    public ResponseEntity<?> refreshtoken(@RequestBody TokenRefreshRequest request, HttpServletResponse response) { // 새로고침할 refresh토큰
         String requestRefreshToken = request.getRefreshToken();
         System.out.println(requestRefreshToken);
 
@@ -99,6 +117,17 @@ public class AuthController {
             String token = jwtUtils.generateTokenFromUsername(refreshUser.getEmail()); // 새로운 Access token
             TokenRefreshResponse tokenRefreshResponse = new TokenRefreshResponse(requestRefreshToken, token);
             System.out.println(tokenRefreshResponse.getAccessToken());
+
+
+            Cookie accessTokenCookie = new Cookie("accessToken", token);
+            accessTokenCookie.setHttpOnly(true);
+            accessTokenCookie.setPath("/");
+            response.addCookie(accessTokenCookie);
+
+            Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken.getToken());
+            refreshTokenCookie.setHttpOnly(true);
+            refreshTokenCookie.setPath("/");
+            response.addCookie(refreshTokenCookie);
 
             return ResponseEntity.ok(new TokenRefreshResponse(requestRefreshToken, token));
         } catch (Exception e) {

@@ -45,7 +45,7 @@
             </form>
 
 
-            {{#sessionedUser}}
+            {{#username}}
             <a class="navbar-brand" href="#">
                 <span id="username">
                     {{username}}
@@ -54,11 +54,11 @@
             <a href="/logout">
                 <button class="btn btn-outline-success" >logout</button>
             </a>
-            {{/sessionedUser}}
-            {{^sessionedUser}}
+            {{/username}}
+            {{^username}}
             <a class="navbar-brand" href="/signup">sign up</a>
-            <a class="navbar-brand" href="/login">sign in</a>
-            {{/sessionedUser}}
+            <a class="navbar-brand" href="/loginPage">sign in</a>
+            {{/username}}
 
 
         </div>

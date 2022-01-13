@@ -57,21 +57,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
                 .formLogin().disable()
                 .httpBasic().disable()
-//                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-//                .addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))
                 .authorizeRequests()
                 .antMatchers("/user/**").access("hasRole('ROLE_USER')")
-//                .antMatchers("/user/**").hasRole("USER")
                 .anyRequest().permitAll();
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
-//        http.addFilterBefore(new JwtFilter(), BasicAuthenticationFilter.class);
-//                .and()
-//                .httpBasic().disable()
-//                .authorizeRequests()
-//                .antMatchers("/admin/**").hasRole("ADMIN")
-//                .antMatchers("/user/**").hasRole("USER")
-//                .anyRequest().permitAll();
 
     }
 }
