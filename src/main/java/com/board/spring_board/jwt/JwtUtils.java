@@ -22,7 +22,6 @@ public class JwtUtils {
 
     public Long getUserIdFromJwtToken(String token){
         String username = Jwts.parser().setSigningKey(JwtProperties.SECRET).parseClaimsJws(token).getBody().getSubject();
-        System.out.println("username" + username);
         return userService.getIdByUsername(username);
     }
 

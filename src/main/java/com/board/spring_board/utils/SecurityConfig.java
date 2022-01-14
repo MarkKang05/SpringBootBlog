@@ -4,7 +4,6 @@ import com.board.spring_board.config.CorsConfig;
 import com.board.spring_board.handler.CustomAccessDeniedHandler;
 import com.board.spring_board.handler.CustomAuthenticationEntryPoint;
 import com.board.spring_board.handler.CustomLogoutHandler;
-import com.board.spring_board.handler.logoutSuccessHandler;
 import com.board.spring_board.jwt.*;
 import com.board.spring_board.repository.UserRepository;
 import com.board.spring_board.service.UserDetailsServiceImpl;
@@ -75,7 +74,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("/logout")
                 .addLogoutHandler(customLogoutHandlerBean())
-//                .logoutSuccessHandler(new logoutSuccessHandler())
                 .logoutSuccessUrl("/");
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

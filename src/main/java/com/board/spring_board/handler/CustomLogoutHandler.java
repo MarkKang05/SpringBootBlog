@@ -26,8 +26,8 @@ public class CustomLogoutHandler implements LogoutHandler {
         String accessToken = accessTokenCookie.getValue();
         Long userId = jwtUtils.getUserIdFromJwtToken(accessToken);
         refreshTokenService.deleteByUserId(userId);
-        response.addCookie(new CookieBuilder("accessToken", ""));
-        response.addCookie(new CookieBuilder("refreshToken", ""));
+        response.addCookie(new CookieBuilder("accessToken", null, 0));
+        response.addCookie(new CookieBuilder("refreshToken", null, 0));
         SecurityContextHolder.clearContext();
     }
 }

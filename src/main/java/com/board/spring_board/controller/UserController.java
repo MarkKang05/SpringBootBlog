@@ -18,12 +18,9 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-//    private UserServiceImpl userService;
     private UserService userService;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 

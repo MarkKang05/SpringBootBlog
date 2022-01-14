@@ -80,13 +80,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 // 리프레시 토큰이 만료된경우 로그인 페이지로 이동
                 catch (NoSuchElementException e) { // 리프레시 토큰 만료됨 -> 로그인 화면
                     logger.info("refresh token 만료");
-                    response.addCookie(new CookieBuilder("accessToken", ""));
-                    response.addCookie(new CookieBuilder("refreshToken", ""));
+                    response.addCookie(new CookieBuilder("accessToken", null,0));
+                    response.addCookie(new CookieBuilder("refreshToken", null, 0));
                 }
 
             }
         } catch (Exception e) { //쿠키 존재 x -> 로그인 화면
-            logger.info(e.getMessage());
+//            logger.info(e.getMessage());
         }
 
         filterChain.doFilter(request, response);
