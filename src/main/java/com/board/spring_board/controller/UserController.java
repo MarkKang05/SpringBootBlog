@@ -73,7 +73,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/user/list")
+    @GetMapping("/admin/list")
     public String getUsers(){
         List<User> list= userRepository.findAll();
         return "<h1>"+ list.toString() +"</h1>";

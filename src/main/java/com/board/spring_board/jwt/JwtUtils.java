@@ -1,11 +1,13 @@
 package com.board.spring_board.jwt;
 
 import com.board.spring_board.auth.PrincipalDetails;
+import com.board.spring_board.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,14 @@ import java.util.Date;
 public class JwtUtils {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    @Autowired
+    private UserService userService;
+
+    public Long getUserIdFromJwtToken(String token){
+        String username = Jwts.parser().setSigningKey(JwtProperties.SECRET).parseClaimsJws(token).getBody().getSubject();
+        System.out.println("username" + username);
+        return userService.getIdByUsername(username);
+    }
 
     public String generateJwtToken(PrincipalDetails userPrincipal) {
         return generateTokenFromUsername(userPrincipal.getUsername());

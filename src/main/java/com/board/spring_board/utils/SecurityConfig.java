@@ -1,6 +1,10 @@
 package com.board.spring_board.utils;
 
 import com.board.spring_board.config.CorsConfig;
+import com.board.spring_board.handler.CustomAccessDeniedHandler;
+import com.board.spring_board.handler.CustomAuthenticationEntryPoint;
+import com.board.spring_board.handler.CustomLogoutHandler;
+import com.board.spring_board.handler.logoutSuccessHandler;
 import com.board.spring_board.jwt.*;
 import com.board.spring_board.repository.UserRepository;
 import com.board.spring_board.service.UserDetailsServiceImpl;
@@ -47,6 +51,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    @Bean
+    public CustomLogoutHandler customLogoutHandlerBean(){
+        return new CustomLogoutHandler();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -58,9 +67,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().disable()
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers("/user/**").access("hasRole('ROLE_USER')")
-                .anyRequest().permitAll();
+//                .antMatchers("/user/**").access("hasRole('ROLE_USER')")
+                .antMatchers("/user/**").hasRole("USER")
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().permitAll()
+            .and()
+                .logout()
+                .logoutUrl("/logout")
+                .addLogoutHandler(customLogoutHandlerBean())
+//                .logoutSuccessHandler(new logoutSuccessHandler())
+                .logoutSuccessUrl("/");
+
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.exceptionHandling()
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .accessDeniedHandler(new CustomAccessDeniedHandler());
 
     }
 }

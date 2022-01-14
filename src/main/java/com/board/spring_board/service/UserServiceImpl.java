@@ -25,4 +25,12 @@ public class UserServiceImpl implements UserService{
         userRepository.save(requestSaveUserDto.toEntity());
         System.out.println("Sign up!!");
     }
+
+    @Override
+    public Long getIdByUsername(String username) {
+        if (userRepository.findByEmail(username).isPresent()){
+            return userRepository.findByEmail(username).get().getId();
+        }
+        return null;
+    }
 }
