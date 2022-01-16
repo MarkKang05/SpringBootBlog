@@ -1,6 +1,7 @@
 package com.board.spring_board.controller;
 
 import com.board.spring_board.auth.PrincipalDetails;
+import com.board.spring_board.dto.jwt.TokenDto;
 import com.board.spring_board.dto.user.RequestLoginUserDto;
 import com.board.spring_board.dto.user.RequestSaveUserDto;
 import com.board.spring_board.exception.TokenRefreshException;
@@ -9,12 +10,14 @@ import com.board.spring_board.model.RefreshToken;
 import com.board.spring_board.dto.user.RequestSaveUserDto;
 import com.board.spring_board.model.Role;
 import com.board.spring_board.model.User;
+import com.board.spring_board.payload.request.CookieBuilder;
 import com.board.spring_board.payload.request.LogOutRequest;
 import com.board.spring_board.payload.request.TokenRefreshRequest;
 import com.board.spring_board.payload.response.JwtResponse;
 import com.board.spring_board.payload.response.MessageResponse;
 import com.board.spring_board.payload.response.TokenRefreshResponse;
 import com.board.spring_board.repository.UserRepository;
+import com.board.spring_board.service.AuthServiceImpl;
 import com.board.spring_board.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +47,7 @@ public class AuthController {
     private final JwtUtils jwtUtils;
     private final RefreshTokenService refreshTokenService;
 
+    private final AuthServiceImpl authService;
 
 
     @PostMapping("/signin")
@@ -51,42 +55,13 @@ public class AuthController {
         //로그인 프로세스 시작
         System.out.println("login Process start");
 
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        PrincipalDetails userDetailsTemp = (PrincipalDetails) authentication.getPrincipal();
-        String tem = userDetailsTemp.getUser().getEmail();
-        userDetailsTemp.getUser().setEmail(userDetailsTemp.getUser().getUsername());
-        userDetailsTemp.getUser().setUsername(tem);
-        PrincipalDetails userDetails = userDetailsTemp;
-
-        String jwt = jwtUtils.generateJwtToken(userDetails);
-
-        List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
-                .collect(Collectors.toList());
-
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUser().getId());
+        TokenDto tokenDto = authService.login(loginRequest);
 
 //        cookie
-        Cookie accessTokenCookie = new Cookie("accessToken", jwt);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setPath("/");
-        response.addCookie(accessTokenCookie);
+        response.addCookie(new CookieBuilder("accessToken", tokenDto.getAccessToken()));
+        response.addCookie(new CookieBuilder("refreshToken", tokenDto.getRefreshToken()));
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken.getToken());
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setPath("/");
-        response.addCookie(refreshTokenCookie);
-
-
-        return ResponseEntity.ok(new JwtResponse( jwt,
-                refreshToken.getToken(),
-                userDetails.getUser().getId(),
-                userDetails.getUser().getUsername(),
-                userDetails.getUser().getEmail(),
-                userDetails.getUser().getRole()));
+        return ResponseEntity.ok(tokenDto);
     }
 
     @PostMapping("/signup")

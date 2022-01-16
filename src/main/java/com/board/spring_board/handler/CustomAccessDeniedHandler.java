@@ -14,16 +14,9 @@ import java.io.IOException;
 
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
-
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         response.setStatus(HttpStatus.FORBIDDEN.value());
-
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-
-
         request.getRequestDispatcher("/err/denied-page").forward(request, response);
-
     }
 }

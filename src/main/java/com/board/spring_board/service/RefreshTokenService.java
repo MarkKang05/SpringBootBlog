@@ -1,7 +1,9 @@
 package com.board.spring_board.service;
 
 import com.board.spring_board.exception.TokenRefreshException;
+import com.board.spring_board.jwt.TokenProvider;
 import com.board.spring_board.model.RefreshToken;
+import com.board.spring_board.model.User;
 import com.board.spring_board.repository.RefreshTokenRepository;
 import com.board.spring_board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class RefreshTokenService {
     private Long refreshTokenDurationMs = 120000L;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
+    private final TokenProvider tokenProvider;
 
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
@@ -50,5 +53,17 @@ public class RefreshTokenService {
     public int deleteByUserId(Long userId) {
         return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
     }
+
+    public RefreshToken getRefreshTokenByUserEmail(String Email){
+        User user = userRepository.findByEmail(Email).get();
+        return refreshTokenRepository.findByUser(user)
+                .orElseThrow(()-> new RuntimeException("Not found RefreshToken"));
+    }
+//    public RefreshToken reissueRefreshToken(String Email){
+//        User user = userRepository.findByEmail(Email).get();
+//        RefreshToken invalidRefreshToken = refreshTokenRepository.findByUserId(user.getId())
+//                .orElseThrow(()-> new RuntimeException("Not found RefreshToken"));
+//
+//    }
 
 }

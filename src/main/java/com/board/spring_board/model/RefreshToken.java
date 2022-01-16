@@ -26,4 +26,9 @@ public class RefreshToken {
     @Column(nullable = false)
     private Instant expiryDate;
 
+    public RefreshToken updateToken(String token){
+        this.token = token;
+        return this;
+    }
+
 }

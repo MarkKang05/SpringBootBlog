@@ -2,7 +2,9 @@ package com.board.spring_board.service;
 
 import com.board.spring_board.dto.user.RequestSaveUserDto;
 import com.board.spring_board.model.Role;
+import com.board.spring_board.model.User;
 import com.board.spring_board.repository.UserRepository;
+import com.board.spring_board.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,5 +34,9 @@ public class UserServiceImpl implements UserService{
             return userRepository.findByEmail(username).get().getId();
         }
         return null;
+    }
+
+    public User getCurrentUser(){
+        return userRepository.findById(SecurityUtils.getCurrentUserId()).get();
     }
 }

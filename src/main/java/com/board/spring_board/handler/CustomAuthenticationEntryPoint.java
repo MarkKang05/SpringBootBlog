@@ -15,12 +15,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         response.setStatus(HttpStatus.FORBIDDEN.value());
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-
         if (authentication == null){ // 로그인 하지 않은 사용자
-            System.out.println("hellow");
             request.setAttribute("msg", "로그인 하지 않았습니다.");
             request.setAttribute("nextPage", "/login");
             SecurityContextHolder.clearContext();

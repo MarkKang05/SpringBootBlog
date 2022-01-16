@@ -3,6 +3,9 @@ package com.board.spring_board.controller;
 import com.board.spring_board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +22,11 @@ public class MainController {
     private BoardService boardService;
 
     @GetMapping(value = "/")
-    public String home(Principal principal, Model model){
+    public String home(@AuthenticationPrincipal UserDetails userDetails, Model model){
 
-        if(principal != null)
-            model.addAttribute("username", principal.getName());
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
+        if(userDetails != null)
+            model.addAttribute("username", userDetails.getUsername());
         model.addAttribute("boards", boardService.getAllBoard());
         return "index";
     }

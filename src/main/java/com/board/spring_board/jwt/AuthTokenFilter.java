@@ -1,19 +1,17 @@
 package com.board.spring_board.jwt;
 
+import com.board.spring_board.dto.jwt.TokenDto;
 import com.board.spring_board.model.RefreshToken;
-import com.board.spring_board.model.User;
+import com.board.spring_board.model.Role;
 import com.board.spring_board.payload.request.CookieBuilder;
-import com.board.spring_board.payload.response.TokenRefreshResponse;
+import com.board.spring_board.repository.RefreshTokenRepository;
 import com.board.spring_board.service.RefreshTokenService;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
@@ -24,7 +22,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
 
@@ -35,71 +32,69 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
     @Autowired
     private RefreshTokenService refreshTokenService;
-
+    @Autowired
+    private TokenProvider tokenProvider;
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         logger.info("doFilterInternal");
+        TokenDto tokenDto = parseToken(request);
+        String accessToken;
+        String refreshToken;
         try {
-            // TODO: 2022/01/13 코드 간소화
-            Cookie accessTokenCookie = WebUtils.getCookie(request, "accessToken");
-            Cookie refreshTokenCookie = WebUtils.getCookie(request, "refreshToken");
-            String accessToken = accessTokenCookie.getValue();
-            String refreshToken = refreshTokenCookie.getValue();
+            accessToken = tokenDto.getAccessToken();
+            refreshToken = tokenDto.getRefreshToken();
+        } catch (Exception e) {
+            accessToken = null;
+            refreshToken = null;
+        }
 
-            if (accessToken != null && jwtUtils.validateJwtToken(accessToken)) {
-                String username = jwtUtils.getUserNameFromJwtToken(accessToken);
+        if(accessToken != null && tokenProvider.validateJwtToken(accessToken)){
+            Authentication authentication = tokenProvider.getAuthentication(accessToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } else if(accessToken != null && tokenProvider.validateJwtToken(refreshToken)){ // accesstoken만료/ 재발급
+            Authentication authentication = tokenProvider.getAuthentication(accessToken);
 
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
-                        userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else if(accessToken != null ){
-                //refresh 쿠키를 이용해서 valid확인하고 유효하면 쿠키에 새로운 엑세스토큰 발급
-
-                try { // 액세스 토큰을 위한 리프레시 토큰이 유효함
-                    logger.info("refresh accessToken process");
-                    RefreshToken requestRefreshToken = refreshTokenService.findByToken(refreshToken).get();
-                    User refreshUser = refreshTokenService.verifyExpiration(requestRefreshToken).getUser();
-                    String token = jwtUtils.generateTokenFromUsername(refreshUser.getEmail()); // 새로운 Access token
-                    response.addCookie(new CookieBuilder("accessToken", token));
-
-                    String username = jwtUtils.getUserNameFromJwtToken(token);
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
-                            userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-                // 리프레시 토큰이 만료됨 (로그인 페이지로 보내야함.) or 리프레시 토큰을 찾을수 없음
-                // 프론트엔드에서 403을 받았을 때 에러메세지 확인 후
-                // 권한 오류이면 권한 없음 페이지 출력 -> 이 경우는 스프링 시큐리티 자체 필터를 이용함
-                // 리프레시 토큰이 만료된경우 로그인 페이지로 이동
-                catch (NoSuchElementException e) { // 리프레시 토큰 만료됨 -> 로그인 화면
-                    logger.info("refresh token 만료");
-                    response.addCookie(new CookieBuilder("accessToken", null,0));
-                    response.addCookie(new CookieBuilder("refreshToken", null, 0));
-                }
-
+            RefreshToken savedRefreshToken = refreshTokenService.getRefreshTokenByUserEmail(authentication.getName());
+            if (!refreshToken.equals(savedRefreshToken.getToken())) {
+                throw new RuntimeException("토큰의 유저 정보가 일치하지 않습니다.");
             }
-        } catch (Exception e) { //쿠키 존재 x -> 로그인 화면
-//            logger.info(e.getMessage());
+
+            TokenDto issuedTokenDto = tokenProvider.generateTokenDto(authentication);
+
+            RefreshToken newRefreshToken = savedRefreshToken.updateToken(issuedTokenDto.getRefreshToken());
+            refreshTokenRepository.save(newRefreshToken);
+            response.addCookie(new CookieBuilder("accessToken", issuedTokenDto.getAccessToken()));
+            response.addCookie(new CookieBuilder("refreshToken", issuedTokenDto.getRefreshToken()));
+            SecurityContextHolder.getContext().setAuthentication(tokenProvider.getAuthentication(issuedTokenDto.getAccessToken()));
+        } else {
+            refreshTokenService.deleteByUserId(1L);
+            response.addCookie(new CookieBuilder("accessToken", null, 0));
+            response.addCookie(new CookieBuilder("refreshToken", null, 0));
+            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);
     }
 
-    // TODO: 2022/01/13 cookie를 이용한 방식으로 바꾸기
-    private String parseJwt(HttpServletRequest request) {
-        String headerAuth = request.getHeader("Authorization");
-
-        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-            return headerAuth.substring(7, headerAuth.length());
+    private TokenDto parseToken(HttpServletRequest request) {
+        Cookie accessTokenCookie = WebUtils.getCookie(request, "accessToken");
+        Cookie refreshTokenCookie = WebUtils.getCookie(request, "refreshToken");
+        String accessToken;
+        String refreshToken;
+        try {
+            accessToken = accessTokenCookie.getValue();
+            refreshToken= refreshTokenCookie.getValue();
+            if (StringUtils.hasText(accessToken) && StringUtils.hasText(refreshToken))
+                return TokenDto.builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
+        } catch (NullPointerException e){
+            return null;
         }
-
         return null;
     }
 }
