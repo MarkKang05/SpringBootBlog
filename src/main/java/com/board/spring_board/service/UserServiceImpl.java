@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService{
 //        System.out.println(requestSaveUserDto.getPassword());
         String encodedPassword = passwordEncoder.encode(requestSaveUserDto.getPassword());
         requestSaveUserDto.setPassword(encodedPassword);
-        requestSaveUserDto.setRole(Role.USER);
+        requestSaveUserDto.setRole(Role.ROLE_USER);
         userRepository.save(requestSaveUserDto.toEntity());
         System.out.println("Sign up!!");
     }

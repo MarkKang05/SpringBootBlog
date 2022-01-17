@@ -50,12 +50,14 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public int deleteByUserId(Long userId) {
-        return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
+    public int deleteByUserEmail(String email) {
+        return refreshTokenRepository.deleteByUser(userRepository.findByEmail(email)
+                .orElseThrow(()->new RuntimeException("Not found User")));
     }
 
     public RefreshToken getRefreshTokenByUserEmail(String Email){
-        User user = userRepository.findByEmail(Email).get();
+        User user = userRepository.findByEmail(Email)
+                .orElseThrow(() -> new RuntimeException("Not Found User"));
         return refreshTokenRepository.findByUser(user)
                 .orElseThrow(()-> new RuntimeException("Not found RefreshToken"));
     }

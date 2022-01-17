@@ -59,7 +59,7 @@ public class BoardServiceImpl implements BoardService{
     public boolean hasAuthority(Long boardId, Long userId) {
         Board board = this.getBoard(boardId);
         User user = userRepository.findById(userId).get();
-        return ( userId.equals(board.getUser().getId()) || user.getRole().equals(Role.ADMIN));
+        return ( userId.equals(board.getUser().getId()) || user.getRole().equals(Role.ROLE_ADMIN));
     }
 
 }

@@ -1,6 +1,5 @@
 package com.board.spring_board.service;
 
-import com.board.spring_board.auth.PrincipalDetails;
 import com.board.spring_board.model.User;
 import com.board.spring_board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.board.spring_board.handler;
 
-import com.board.spring_board.jwt.JwtUtils;
+import com.board.spring_board.jwt.TokenProvider;
 import com.board.spring_board.payload.request.CookieBuilder;
 import com.board.spring_board.service.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +18,15 @@ public class CustomLogoutHandler implements LogoutHandler {
     @Autowired
     private RefreshTokenService refreshTokenService;
     @Autowired
-    private JwtUtils jwtUtils;
+    private TokenProvider tokenProvider;
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         Cookie accessTokenCookie = WebUtils.getCookie(request, "accessToken");
         String accessToken = accessTokenCookie.getValue();
-        Long userId = jwtUtils.getUserIdFromJwtToken(accessToken);
-        refreshTokenService.deleteByUserId(userId);
+        String name = tokenProvider.getAuthentication(accessToken).getName();
+
+        refreshTokenService.deleteByUserEmail(name);
         response.addCookie(new CookieBuilder("accessToken", null, 0));
         response.addCookie(new CookieBuilder("refreshToken", null, 0));
         SecurityContextHolder.clearContext();

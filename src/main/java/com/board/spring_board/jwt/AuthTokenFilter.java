@@ -27,8 +27,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
     private UserDetailsService userDetailsService;
     @Autowired
     private RefreshTokenService refreshTokenService;
@@ -69,8 +67,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             response.addCookie(new CookieBuilder("accessToken", issuedTokenDto.getAccessToken()));
             response.addCookie(new CookieBuilder("refreshToken", issuedTokenDto.getRefreshToken()));
             SecurityContextHolder.getContext().setAuthentication(tokenProvider.getAuthentication(issuedTokenDto.getAccessToken()));
-        } else {
-            refreshTokenService.deleteByUserId(1L);
+        } else if (accessToken!=null){
+            refreshTokenService.deleteByUserEmail(SecurityContextHolder.getContext().getAuthentication().getName());
             response.addCookie(new CookieBuilder("accessToken", null, 0));
             response.addCookie(new CookieBuilder("refreshToken", null, 0));
             SecurityContextHolder.clearContext();
