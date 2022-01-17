@@ -36,7 +36,4 @@ public class UserServiceImpl implements UserService{
         return null;
     }
 
-    public User getCurrentUser(){
-        return userRepository.findById(SecurityUtils.getCurrentUserId()).get();
-    }
 }

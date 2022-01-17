@@ -56,17 +56,9 @@ public class TokenProvider {
                 Arrays.stream(claims.get("auth").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-        System.out.println(authorities.toString());
-//        Collection<GrantedAuthority> authorities = new ArrayList<>();
-//        for(String role : claims.get("auth").toString().split(",")){
-//            String role2 = "Role_"+role;
-//            authorities.add(new SimpleGrantedAuthority(role2));
-//        }
-//        return authorities;
         UserDetails principal = new User(claims.getSubject(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
-//        return new UsernamePasswordAuthenticationToken(user, "");
     }
 
 

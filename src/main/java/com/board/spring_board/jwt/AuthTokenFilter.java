@@ -2,8 +2,7 @@ package com.board.spring_board.jwt;
 
 import com.board.spring_board.dto.jwt.TokenDto;
 import com.board.spring_board.model.RefreshToken;
-import com.board.spring_board.model.Role;
-import com.board.spring_board.payload.request.CookieBuilder;
+import com.board.spring_board.utils.CustomCookie;
 import com.board.spring_board.repository.RefreshTokenRepository;
 import com.board.spring_board.service.RefreshTokenService;
 import org.slf4j.Logger;
@@ -56,21 +55,21 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             Authentication authentication = tokenProvider.getAuthentication(accessToken);
 
             RefreshToken savedRefreshToken = refreshTokenService.getRefreshTokenByUserEmail(authentication.getName());
-            if (!refreshToken.equals(savedRefreshToken.getToken())) {
+            if (!refreshToken.equals(savedRefreshToken.getToken()))
                 throw new RuntimeException("토큰의 유저 정보가 일치하지 않습니다.");
-            }
 
             TokenDto issuedTokenDto = tokenProvider.generateTokenDto(authentication);
 
             RefreshToken newRefreshToken = savedRefreshToken.updateToken(issuedTokenDto.getRefreshToken());
             refreshTokenRepository.save(newRefreshToken);
-            response.addCookie(new CookieBuilder("accessToken", issuedTokenDto.getAccessToken()));
-            response.addCookie(new CookieBuilder("refreshToken", issuedTokenDto.getRefreshToken()));
+            response.addCookie(new CustomCookie("accessToken", issuedTokenDto.getAccessToken()));
+            response.addCookie(new CustomCookie("refreshToken", issuedTokenDto.getRefreshToken()));
             SecurityContextHolder.getContext().setAuthentication(tokenProvider.getAuthentication(issuedTokenDto.getAccessToken()));
         } else if (accessToken!=null){
-            refreshTokenService.deleteByUserEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-            response.addCookie(new CookieBuilder("accessToken", null, 0));
-            response.addCookie(new CookieBuilder("refreshToken", null, 0));
+            Authentication authentication = tokenProvider.getAuthentication(accessToken);
+            refreshTokenService.deleteByUserEmail(authentication.getName());
+            response.addCookie(new CustomCookie("accessToken", null, 0));
+            response.addCookie(new CustomCookie("refreshToken", null, 0));
             SecurityContextHolder.clearContext();
         }
 

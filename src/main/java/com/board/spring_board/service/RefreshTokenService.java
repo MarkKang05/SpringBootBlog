@@ -59,7 +59,8 @@ public class RefreshTokenService {
         User user = userRepository.findByEmail(Email)
                 .orElseThrow(() -> new RuntimeException("Not Found User"));
         return refreshTokenRepository.findByUser(user)
-                .orElseThrow(()-> new RuntimeException("Not found RefreshToken"));
+                .orElse(null);
+//                .orElseThrow(()-> new RuntimeException("Not found RefreshToken"));
     }
 //    public RefreshToken reissueRefreshToken(String Email){
 //        User user = userRepository.findByEmail(Email).get();

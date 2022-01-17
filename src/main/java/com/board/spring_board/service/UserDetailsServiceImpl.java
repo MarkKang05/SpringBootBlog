@@ -25,7 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        logger.info("UserDetailsService 진입");
+//        logger.info("UserDetailsService 진입");
         return userRepository.findByEmail(username)
                 .map(this::createUserDetails)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없음"));
@@ -33,7 +33,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private UserDetails createUserDetails(User user){
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().toString());
-        System.out.println(user.toString());
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),

@@ -34,8 +34,6 @@ public class AuthServiceImpl {
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println(name);
 
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 

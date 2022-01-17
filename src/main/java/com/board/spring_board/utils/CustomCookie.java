@@ -1,18 +1,17 @@
-package com.board.spring_board.payload.request;
+package com.board.spring_board.utils;
 
-import lombok.Builder;
 
 import javax.servlet.http.Cookie;
 
-public class CookieBuilder extends Cookie{
+public class CustomCookie extends Cookie{
 
-    public CookieBuilder(String name, String value) {
+    public CustomCookie(String name, String value) {
         super(name, value);
         super.setHttpOnly(true);
         super.setPath("/");
     }
 
-    public CookieBuilder(String name, String value, int expired){
+    public CustomCookie(String name, String value, int expired){
         super(name, value);
         super.setHttpOnly(true);
         super.setPath("/");

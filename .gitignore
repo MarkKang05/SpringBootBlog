@@ -39,3 +39,4 @@ out/
 ### src/main/resources/application.properties
 *.properties
 *.yml
+src/main/resources/static/bootstrap/

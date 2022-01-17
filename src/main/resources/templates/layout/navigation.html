@@ -19,10 +19,10 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    <a class="nav-link active" aria-current="page" href="#">Board</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
+                    <a class="nav-link" href="#">BoardCreate</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -44,8 +44,7 @@
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
 
-
-            {{#username}}
+            {{#user}}
             <a class="navbar-brand" href="#">
                 <span id="username">
                     {{username}}
@@ -55,11 +54,11 @@
 <!--                <button class="btn btn-outline-success" >logout</button>-->
                 logout
             </a>
-            {{/username}}
-            {{^username}}
-            <a class="navbar-brand" href="/signup">sign up</a>
-            <a class="navbar-brand" href="/loginPage">sign in</a>
-            {{/username}}
+            {{/user}}
+            {{^user}}
+            <a class="navbar-brand" href="/auth/signupPage">sign up</a>
+            <a class="navbar-brand" href="/auth/loginPage">sign in</a>
+            {{/user}}
 
 
         </div>

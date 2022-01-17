@@ -1,4 +1,4 @@
-{{> /layout/header}}
+{{> /layout/navigation}}
 
 
 <form class="form-horizontal" >
@@ -6,14 +6,6 @@
         <div id="legend">
             <legend class="">LogIn</legend>
         </div>
-<!--        <div class="control-group">-->
-<!--            &lt;!&ndash; Username &ndash;&gt;-->
-<!--            <label class="control-label"  for="username">Username</label>-->
-<!--            <div class="controls">-->
-<!--                <input type="text" id="username" name="username" placeholder="" class="input-xlarge">-->
-<!--                <p class="help-block">Username can contain any letters or numbers, without spaces</p>-->
-<!--            </div>-->
-<!--        </div>-->
 
         <div class="control-group">
             <!-- E-mail -->
@@ -33,15 +25,6 @@
             </div>
         </div>
 
-<!--        <div class="control-group">-->
-<!--            &lt;!&ndash; Password &ndash;&gt;-->
-<!--            <label class="control-label"  for="password_confirm">Password (Confirm)</label>-->
-<!--            <div class="controls">-->
-<!--                <input type="password" id="password_confirm" name="password_confirm" placeholder="" class="input-xlarge">-->
-<!--                <p class="help-block">Please confirm password</p>-->
-<!--            </div>-->
-<!--        </div>-->
-
     </fieldset>
 </form>
 
@@ -53,16 +36,8 @@
 </div>
 
 <script>
-    function login_click2() {
-        var xhr, url = 'http://localhost:8080/login'
-        var contextType = 'application/json'
-        xhr = doajax
-
-    }
     function login_click() {
-        console.log("hhh");
-        var res2;
-        fetch("/signin", {
+        fetch("/auth/login", {
             method: 'post',
             headers: {
                 'content-type': 'application/json'
@@ -72,14 +47,8 @@
                 password: "1234"
             })
         }).then(res => {
-            return res.json();
-        })
-        .then(jsonRes=> {
-            console.log(jsonRes)
-            localStorage.setItem("user", JSON.stringify(jsonRes))
             location.href="/";
         });
-
     }
 </script>
 

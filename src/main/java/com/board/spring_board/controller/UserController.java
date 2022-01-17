@@ -5,78 +5,35 @@ import com.board.spring_board.model.User;
 import com.board.spring_board.repository.UserRepository;
 import com.board.spring_board.service.UserService;
 import com.board.spring_board.utils.HttpSessionUtils;
+import com.board.spring_board.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
+@RequestMapping("/auth")
 public class UserController {
 
     @Autowired
-    private UserService userService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private SecurityUtils securityUtils;
 
-    // Sign Up
-    @GetMapping("/signup")
-    public String signupPage(HttpSession session){
-        if(HttpSessionUtils.isLoginUser(session)){
-            return "redirect:/";
-        }
-        return "user/userCreate";
+    // Sign Up Page
+    @GetMapping("/signupPage")
+    public String signupPage(){
+        return "/user/userCreate";
     }
 
-    @PostMapping("/user/signupProc")
-    public String signupProc(RequestSaveUserDto requestSaveUserDto){
-        userService.createUser(requestSaveUserDto);
-        return "redirect:/login";
-    }
-
-    // Log In
+    // Log In Page
     @GetMapping("/loginPage")
-    public String loginPage(HttpSession session){
-        if(HttpSessionUtils.isLoginUser(session))
-            return "redirect:/";
-
+    public String loginPage(){
         return "/user/userLogin";
     }
-
-    @PostMapping("/user/loginProc")
-    public String loginProc(RequestSaveUserDto requestSaveUserDto, HttpSession session){
-        User loginUser = requestSaveUserDto.toEntity();
-        if(userRepository.findByEmail(loginUser.getEmail()) == null) {
-            System.out.println("Not found email");
-            return "redirect:/";
-        } else{
-//            System.out.println(userRepository.findByEmail(loginUser.getEmail()).getPassword());
-//            System.out.println(passwordEncoder.encode("qwer2"));
-            if(passwordEncoder.matches(loginUser.getPassword(), userRepository.findByEmail(loginUser.getEmail()).get().getPassword() ) ) {
-                loginUser = userRepository.findByEmail(requestSaveUserDto.getEmail()).get();
-                session.setAttribute(HttpSessionUtils.USER_SESSION_KEY, loginUser);
-                return "redirect:/";
-            }
-            else{
-                System.out.println("Not match password");
-                return "redirect:/";
-            }
-        }
-
-    }
-
-    @GetMapping("/admin/list")
-    public String getUsers(){
-        List<User> list= userRepository.findAll();
-        return "<h1>"+ list.toString() +"</h1>";
-    }
-
-
 
 
 
