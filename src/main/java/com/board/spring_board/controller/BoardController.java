@@ -24,7 +24,7 @@ public class BoardController {
     @Autowired
     private SecurityUtils securityUtils;
 
-    @GetMapping("/boardForm")
+    @GetMapping("/board/boardForm")
     public String boardCreatePage(){
         if (!securityUtils.isLogin()){
             return "redirect:/";
@@ -42,7 +42,7 @@ public class BoardController {
         return "redirect:/";
     }
 
-    @GetMapping("/board/{id}")
+    @GetMapping("/board/details/{id}")
     public String getBoard(@PathVariable Long id, Model model){
 
 //        System.out.println(boardService.getBoard(id).get());
