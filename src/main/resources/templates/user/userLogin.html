@@ -7,6 +7,10 @@
             <legend class="">LogIn</legend>
         </div>
 
+        {{#error}}
+        <h2>wrong {{error}}</h2>
+        {{/error}}
+
         <div class="control-group">
             <!-- E-mail -->
             <label class="control-label" for="email">E-mail</label>
@@ -43,12 +47,17 @@
                 'content-type': 'application/json'
             },
             body: JSON.stringify({
-                email: "qwer",
-                password: "1234"
+                email: $('#email').val(),
+                password: $('#password').val()
             })
-        }).then(res => {
-            location.href="/";
-        });
+        }).then(async res => {
+            if (res.ok) {
+                location.href="/"
+            } else {
+                // console.log("res: "+ await res.text())
+                location.href="/auth/loginPage?error="+await res.text();
+            }
+        })
     }
 </script>
 

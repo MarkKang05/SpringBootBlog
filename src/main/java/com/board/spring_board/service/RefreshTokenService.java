@@ -1,6 +1,7 @@
 package com.board.spring_board.service;
 
 import com.board.spring_board.exception.TokenRefreshException;
+import com.board.spring_board.jwt.JwtProperties;
 import com.board.spring_board.jwt.TokenProvider;
 import com.board.spring_board.model.RefreshToken;
 import com.board.spring_board.model.User;
@@ -19,7 +20,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    private Long refreshTokenDurationMs = 120000L;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
@@ -32,7 +32,7 @@ public class RefreshTokenService {
         RefreshToken refreshToken = new RefreshToken();
 
         refreshToken.setUser(userRepository.findById(userId).get());
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+        refreshToken.setExpiryDate(Instant.now().plusMillis(JwtProperties.REFRESHTOKEN_EXPIRATION_TIME));
         refreshToken.setToken(UUID.randomUUID().toString());
 
         refreshToken = refreshTokenRepository.save(refreshToken);

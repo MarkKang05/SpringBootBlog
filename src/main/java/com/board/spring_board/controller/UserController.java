@@ -9,9 +9,11 @@ import com.board.spring_board.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -20,8 +22,6 @@ import java.util.List;
 @RequestMapping("/auth")
 public class UserController {
 
-    @Autowired
-    private SecurityUtils securityUtils;
 
     // Sign Up Page
     @GetMapping("/signupPage")
@@ -31,7 +31,10 @@ public class UserController {
 
     // Log In Page
     @GetMapping("/loginPage")
-    public String loginPage(){
+    public String loginPage(@RequestParam String error, Model model){
+        if (error!="")
+            model.addAttribute("error", error);
+
         return "/user/userLogin";
     }
 
