@@ -1,7 +1,6 @@
 package com.board.spring_board.utils;
 
 import com.board.spring_board.config.CorsConfig;
-import com.board.spring_board.controller.CustomAuthenticationProvider;
 import com.board.spring_board.handler.CustomAccessDeniedHandler;
 import com.board.spring_board.handler.CustomAuthenticationEntryPoint;
 import com.board.spring_board.handler.CustomLogoutHandler;
@@ -12,13 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -28,7 +25,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserRepository userRepository;
     private final CorsConfig corsConfig;
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -54,17 +50,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-//    @Bean
-//    public AuthenticationProvider authenticationProvider() {
-//        return new CustomAuthenticationProvider();
-//    }
 
     @Bean
     public CustomLogoutHandler customLogoutHandlerBean(){
         return new CustomLogoutHandler();
     }
-//    @Bean
-//    public CustomAuthFailureHandler customAuthFailureHandlerBean() {return new CustomAuthFailureHandler();}
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

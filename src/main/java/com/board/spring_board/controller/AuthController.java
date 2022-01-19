@@ -54,7 +54,11 @@ public class AuthController {
                 .build();
 
         return userRepository.save(user).getId();
+    }
 
+    @PostMapping("/existEmailProc")
+    public boolean existEmail(@RequestBody String email){
+        return userRepository.existsByEmail(email);
     }
 
 }

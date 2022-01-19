@@ -1,6 +1,6 @@
 {{> /layout/navigation}}
 
-<form class="form-horizontal" action='/auth/login' method="POST">
+<form class="form-horizontal" action='/auth/signup' method="POST">
     <fieldset>
         <div id="legend">
             <legend class="">Register</legend>
@@ -21,6 +21,9 @@
                 <input type="text" id="email" name="email" placeholder="" class="input-xlarge">
                 <p class="help-block">Please provide your E-mail</p>
             </div>
+            <button type="button" onclick="email_check();"id="email_check_id">
+                중복 확인
+            </button>
         </div>
 
         <div class="control-group">
@@ -44,7 +47,7 @@
         <div class="control-group">
             <!-- Button -->
             <div class="controls">
-                <button class="btn btn-success" onclick=success()>Register</button>
+                <button class="btn btn-success" type="button" onclick=success()>Register</button>
             </div>
         </div>
     </fieldset>
@@ -53,7 +56,40 @@
 <script>
     function success(){
         alert("회원가입을 환영합니다!");
+        fetch("/auth/signup", {
+            method: 'post',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: $('#username').val(),
+                email: $('#email').val(),
+                password: $('#password').val()
+            })
+        }).then(async res => {
+            if (res.ok) {
+                location.href="/auth/loginPage?error="
+            } else {
+                console.log("res: "+ await res.text())
+            }
+        })
+
     }
+
+    function email_check() {
+        fetch("/auth/existEmailProc", {
+            method: 'post',
+            body: $('#email').val()
+        }).then(async res => {
+            // var result = await res.text();
+            var isTrue = (await res.text() === 'true');
+            if (isTrue === true)
+                document.getElementById("email_check_id").innerHTML = "Already Account";
+            else
+                document.getElementById("email_check_id").innerHTML = "able to use";
+        })
+    }
+
 
 </script>
 

@@ -24,7 +24,6 @@ public class SecurityUtils {
 
     public boolean isLogin(){
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication.getName());
         if (authentication == null || authentication.getName()==null){
             return false;
         }
